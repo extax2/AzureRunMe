@@ -103,7 +103,7 @@ namespace WorkerRole
 
         /// <summary>
         /// Expands keywords in the buffer to allow configuration strings
-        /// to be set dynamically at runtime
+        /// to be set dynamically at Runtime
         /// </summary>
         private string ExpandKeywords(string buffer)
         {
@@ -438,7 +438,7 @@ namespace WorkerRole
         /// </summary>
         /// <param name="workingDirectory">Directory on disk</param>
         /// <param name="script">Batch file name (e.g. runme.bat)</param>
-        private Process Run(string workingDirectory, string environmentVariables, string batchFile)
+        public static Process Run(string workingDirectory, string environmentVariables, string batchFile, CloudDrive cloudDrive)
         {
             const string IP_ADDRESS = "ipaddress";
             const string DEPLOYMENT_ID = "deploymentid";
@@ -513,6 +513,8 @@ namespace WorkerRole
             return ExpandKeywords(RoleEnvironment.GetConfigurationSettingValue("WorkingDirectory"));
         }
 
+        private QueueProcessor queueProcessor;
+
         public bool OnStart()
         {
             log.WriteEntry("OnStart", "", GetLabel());
@@ -572,6 +574,21 @@ namespace WorkerRole
             catch (Exception e)
             {
                 Tracer.WriteLine(e, "Error");
+            }
+
+            if (bool.Parse(RoleEnvironment.GetConfigurationSettingValue("ProcessQueue")))
+            {
+                Tracer.WriteLine("Starting Queue Processor", "Information");
+
+                this.queueProcessor = new QueueProcessor(
+                    RoleEnvironment.GetConfigurationSettingValue("InboundQueue"),
+                    RoleEnvironment.GetConfigurationSettingValue("OutboundQueue"),
+                    int.Parse(RoleEnvironment.GetConfigurationSettingValue("QueueCommandTimeout")),
+                    GetWorkingDirectory(),
+                    RoleEnvironment.GetConfigurationSettingValue("EnvironmentVariables"),
+                    this.cloudDrive);
+
+                this.queueProcessor.Start();
             }
 
             Tracer.WriteLine("Started", "Information");
@@ -708,11 +725,16 @@ namespace WorkerRole
 
             UnmountCloudDrive();
 
+            if (null != this.queueProcessor)
+            {
+                this.queueProcessor.Stop();
+            }
+
             Tracer.WriteLine("Stopped", "Critical");
             log.WriteEntry("Stopped", "", GetLabel());
         }
 
-        private void EnvironmentVariables(ProcessStartInfo processStartInfo, string environmentVariables)
+        public static void EnvironmentVariables(ProcessStartInfo processStartInfo, string environmentVariables)
         {
             string[] assignments = environmentVariables.Split(';');
 
@@ -752,7 +774,7 @@ namespace WorkerRole
                 {
                     if (command != string.Empty)
                     {
-                        Process process = Run(workingDirectory, environmentVariables, command);
+                        Process process = Run(workingDirectory, environmentVariables, command, this.cloudDrive);
                         processes.Add(process);
                         Tracer.WriteLine(string.Format("Process {0} started,({1})", process.Handle, command), "Information");
                     }

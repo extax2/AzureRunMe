@@ -84,7 +84,7 @@
     <CodeAnalysisRuleDirectories>;c:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ServiceBus, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.ServiceBus">
       <HintPath>C:\Program Files\Windows Azure AppFabric SDK - June 2011 CTP\ServiceBus\Microsoft.ServiceBus.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.CloudDrive, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -120,6 +120,7 @@
     <Compile Include="BlobExtensions.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogEntry.cs" />
+    <Compile Include="QueueProcessor.cs" />
     <Compile Include="RunMe.cs" />
     <Compile Include="Tracer.cs" />
     <Compile Include="WorkerRole.cs" />
