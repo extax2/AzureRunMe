@@ -341,11 +341,13 @@ namespace WorkerRole
 
                 Tracer.WriteLine(string.Format("Extracting {0}", packageName), "Information");
 
-                SevenZipExtractor extractor = new SevenZipExtractor(stream);
-                // set 7zip dll path
-                string sevenZipPath = Path.Combine(Directory.GetCurrentDirectory(), @"Redist\7z64.dll");
-                SevenZipExtractor.SetLibraryPath(sevenZipPath);
-                extractor.ExtractArchive(workingDirectory);
+                using (SevenZipExtractor extractor = new SevenZipExtractor(stream))
+                {
+                    // set 7zip dll path
+                    string sevenZipPath = Path.Combine(Directory.GetCurrentDirectory(), @"Redist\7z64.dll");
+                    SevenZipExtractor.SetLibraryPath(sevenZipPath);
+                    extractor.ExtractArchive(workingDirectory);
+                }
             }
 
             Tracer.WriteLine("Extraction finished", "Information");

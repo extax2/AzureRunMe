@@ -156,7 +156,7 @@ The level of logging and the frequency (in minutes) with which logs are shipped 
 I recommend Cerebrata's [Windows Azure Diagostics Manager](http://www.cerebrata.com/products/AzureDiagnosticsManager/Default.aspx) for viewing
 the output.
 
-You can now copy arbitrary log files (e.g. Tomcat logs) ffrom AzureRunMe to the Blob storage azurerunme-files container using:
+You can now copy arbitrary log files (e.g. Tomcat logs) from AzureRunMe to the Blob storage azurerunme-files container using:
 
 		<Setting name="ScheduledTransferFiles" value="c:\logs\file1.txt;c:\logs\file2.txt"/>
 
