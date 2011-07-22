@@ -86,6 +86,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.ServiceBus">
       <HintPath>C:\Program Files\Windows Azure AppFabric SDK - June 2011 CTP\ServiceBus\Microsoft.ServiceBus.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.CloudDrive, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">

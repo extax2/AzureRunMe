@@ -1,4 +1,22 @@
-﻿using System;
+﻿#region Copyright (c) 2010 - 2011 Active Web Solutions Ltd
+//
+// (C) Copyright 2010 - 2011 Active Web Solutions Ltd
+//      All rights reserved.
+//
+// This software is provided "as is" without warranty of any kind,
+// express or implied, including but not limited to warranties as to
+// quality and fitness for a particular purpose. Active Web Solutions Ltd
+// does not support the Software, nor does it warrant that the Software
+// will meet your requirements or that the operation of the Software will
+// be uninterrupted or error free or that any defects will be
+// corrected. Nothing in this statement is intended to limit or exclude
+// any liability for personal injury or death caused by the negligence of
+// Active Web Solutions Ltd, its employees, contractors or agents.
+//
+#endregion
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +24,7 @@ using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.StorageClient;
 using Microsoft.WindowsAzure;
 using System.IO;
+using System.Diagnostics;
 
 namespace WorkerRole
 {
@@ -121,12 +140,12 @@ namespace WorkerRole
             Tracer.WriteLine(string.Format("Starting task '{0}'", task), "Information");
 
             task.ProcessingTime = DateTime.UtcNow;
-            RunMe.Run(this.WorkingDirectory, this.EnvironmentVariables, this.Command, this.CloudDrive, task.InputFilename);
+            Run(this.WorkingDirectory,  this.Command, task.InputFilename);
             task.ProcessingDuration = (int)(DateTime.UtcNow - task.ProcessingTime).TotalSeconds;
 
             if (!string.IsNullOrWhiteSpace(task.OutputFilename))
             {
-                UploadBlob(this.InboundBlobContainer, task.InputFilename, this.WorkingDirectory);
+                UploadBlob(this.OutboundBlobContainer, task.OutputFilename, this.WorkingDirectory);
             }
 
             Tracer.WriteLine(string.Format("Finished task '{0}'", task), "Information");
@@ -150,7 +169,7 @@ namespace WorkerRole
 
         private static CloudStorageAccount GetStorageAccount()
         {
-            return CloudStorageAccount.Parse(RoleEnvironment.GetConfigurationSettingValue("Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString"));
+            return CloudStorageAccount.Parse(RoleEnvironment.GetConfigurationSettingValue("DataConnectionString"));
         }
 
 
@@ -217,7 +236,7 @@ namespace WorkerRole
             CloudBlobContainer container = blobClient.GetContainerReference(containerName);
             container.CreateIfNotExist();
             
-            CloudBlockBlob blob = container.GetBlockBlobReference(filename);
+            CloudBlob blob = container.GetBlobReference(filename);
 
             Tracer.WriteLine(string.Format("Uploading {0}", blob.Uri), "Information");
 
@@ -226,5 +245,44 @@ namespace WorkerRole
             Tracer.WriteLine(string.Format("Upload {0}", blob.Uri), "Information");
         }
 
+
+        private Process Run(string workingDirectory, string batchFile, string args)
+        {
+            if (string.IsNullOrWhiteSpace(batchFile)) throw new ArgumentNullException("batchFile");
+
+            string command = Path.Combine(
+                    workingDirectory,
+                    batchFile);
+
+            ProcessStartInfo startInfo = new ProcessStartInfo(command)
+            {
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = workingDirectory,
+                Arguments = args
+            };
+
+
+            Tracer.WriteLine(string.Format("Start Process {0}", command), "Information");
+
+            Process process = new Process()
+            {
+                StartInfo = startInfo
+            };
+
+            process.ErrorDataReceived += (sender, e) => { Tracer.WriteLine(e.Data, "Information"); };
+            process.OutputDataReceived += (sender, e) => { Tracer.WriteLine(e.Data, "Information"); };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            Tracer.WriteLine(string.Format("Process {0}", process.Handle), "Information");
+
+            return process;
+        }
     }
 }

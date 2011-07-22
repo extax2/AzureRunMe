@@ -32,7 +32,6 @@ using SevenZip;
 using System.Xml;
 using System.Timers;
 
-
 namespace WorkerRole
 {
     public class RunMe
@@ -438,7 +437,7 @@ namespace WorkerRole
         /// </summary>
         /// <param name="workingDirectory">Directory on disk</param>
         /// <param name="script">Batch file name (e.g. runme.bat)</param>
-        public static Process Run(string workingDirectory, string environmentVariables, string batchFile, CloudDrive cloudDrive, string args)
+        private Process Run(string workingDirectory, string environmentVariables, string batchFile)
         {
             const string IP_ADDRESS = "ipaddress";
             const string DEPLOYMENT_ID = "deploymentid";
@@ -456,8 +455,7 @@ namespace WorkerRole
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                WorkingDirectory = workingDirectory,
-                Arguments = args
+                WorkingDirectory = workingDirectory
             };
 
             EnvironmentVariables(startInfo, environmentVariables);
@@ -577,22 +575,30 @@ namespace WorkerRole
                 Tracer.WriteLine(e, "Error");
             }
 
-            if (bool.Parse(RoleEnvironment.GetConfigurationSettingValue("ProcessQueue")))
+            try
             {
-                Tracer.WriteLine("Starting Queue Processor", "Information");
+                if (bool.Parse(RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.ProcessQueue")))
+                {
+                    Tracer.WriteLine("Starting Queue Processor", "Information");
 
-                this.queueProcessor = new QueueProcessor(
-                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.InboundQueue"),
-                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.OutboundQueue"),
-                    int.Parse(RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.CommandTimeout")),
-                    GetWorkingDirectory(),
-                    RoleEnvironment.GetConfigurationSettingValue("EnvironmentVariables"),
-                    this.cloudDrive,
-                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.InboundBlobContainer"),
-                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.OutboundBlobContainer"),
-                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.Command"));
+                    this.queueProcessor = new QueueProcessor(
+                        RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.InboundQueue"),
+                        RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.OutboundQueue"),
+                        int.Parse(RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.CommandTimeout")),
+                        GetWorkingDirectory(),
+                        RoleEnvironment.GetConfigurationSettingValue("EnvironmentVariables"),
+                        this.cloudDrive,
+                        RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.InboundBlobContainer"),
+                        RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.OutboundBlobContainer"),
+                        RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.Command"));
 
-                this.queueProcessor.Start();
+                    this.queueProcessor.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                Tracer.WriteLine(ex, "Error");
+                throw;
             }
 
             Tracer.WriteLine("Started", "Information");
@@ -778,7 +784,7 @@ namespace WorkerRole
                 {
                     if (command != string.Empty)
                     {
-                        Process process = Run(workingDirectory, environmentVariables, command, this.cloudDrive, null);
+                        Process process = Run(workingDirectory, environmentVariables, command);
                         processes.Add(process);
                         Tracer.WriteLine(string.Format("Process {0} started,({1})", process.Handle, command), "Information");
                     }
