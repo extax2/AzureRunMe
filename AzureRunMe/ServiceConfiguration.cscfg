@@ -14,7 +14,7 @@
       <Setting name="OnStopCommands" value="stop.bat" />
       <Setting name="DontExit" value="true" />
       <Setting name="DefaultConnectionLimit" value="12" />
-      <Setting name="ScheduledTransferFiles" value="c:\logs\file1.txt;c:\logs\file2.txt"/>
+      <Setting name="ScheduledTransferFiles" value="c:\logs\file1.txt;c:\logs\file2.txt" />
       <Setting name="ScheduledTransferLogLevelFilter" value="Verbose" />
       <Setting name="ScheduledTransferPeriod" value="1" />
       <Setting name="TraceConnectionString" value="ServicePath=trace/$roleinstanceid$;ServiceNamespace=YOURNAMESPACE;IssuerName=YOURISSUERNAME;IssuerSecret=YOURISSUERSECRET" />
@@ -34,6 +34,13 @@
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2015-12-01T23:59:59.0000000+00:00" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=YOURACCOUNTNAME;AccountKey=YOURACCOUNTKEY" />
+      <Setting name="BatchProcessing.ProcessQueue" value="true" />
+      <Setting name="BatchProcessing.InboundQueue" value="queue-in" />
+      <Setting name="BatchProcessing.OutboundQueue" value="queue-out" />
+      <Setting name="BatchProcessing.CommandTimeout" value="600" />
+      <Setting name="BatchProcessing.InboundBlobContainer" value="Inbound" />
+      <Setting name="BatchProcessing.OutboundBlobContainer" value="Outbound" />
+      <Setting name="BatchProcessing.Command" value="Process.bat" />
     </ConfigurationSettings>
     <Certificates>
       <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="E16E8C182ECE44B5B1E3742955A5D022BB6F30B2" thumbprintAlgorithm="sha1" />

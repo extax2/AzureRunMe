@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace WorkerRole
 {
@@ -31,6 +33,26 @@ namespace WorkerRole
         /// The time the processing started
         /// </summary>
         public DateTime ProcessingTime { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            XmlSerializer serializer = new XmlSerializer(typeof(ProcessingTask));
+            using (XmlWriter writer = XmlWriter.Create(sb))
+            {
+                serializer.Serialize(writer, this);
+            }
+            return sb.ToString();
+        }
+
+        public static ProcessingTask FromString(string value)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(ProcessingTask));
+            using (System.IO.StringReader stream = new System.IO.StringReader(value))
+            {
+                return serializer.Deserialize(stream) as ProcessingTask;
+            }
+        }
 
     }
 }

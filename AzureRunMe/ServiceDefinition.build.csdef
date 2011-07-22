@@ -53,6 +53,13 @@
       <Setting name="LogTableName" />
       <Setting name="LogConnectionString" />
       <Setting name="Label" />
+      <Setting name="BatchProcessing.ProcessQueue" />
+      <Setting name="BatchProcessing.InboundQueue" />
+      <Setting name="BatchProcessing.OutboundQueue" />
+      <Setting name="BatchProcessing.CommandTimeout" />
+      <Setting name="BatchProcessing.InboundBlobContainer" />
+      <Setting name="BatchProcessing.OutboundBlobContainer" />
+      <Setting name="BatchProcessing.Command" />
     </ConfigurationSettings>
     <Imports>
       <Import moduleName="RemoteAccess" />

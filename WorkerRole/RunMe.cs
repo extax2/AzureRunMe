@@ -95,7 +95,7 @@ namespace WorkerRole
 
                 return xmlDocument.GetElementsByTagName("RoleModel")[0].Attributes["version"].Value;
             }
-            catch (Exception e)
+            catch
             {
                 return "unknown";
             }
@@ -438,7 +438,7 @@ namespace WorkerRole
         /// </summary>
         /// <param name="workingDirectory">Directory on disk</param>
         /// <param name="script">Batch file name (e.g. runme.bat)</param>
-        public static Process Run(string workingDirectory, string environmentVariables, string batchFile, CloudDrive cloudDrive)
+        public static Process Run(string workingDirectory, string environmentVariables, string batchFile, CloudDrive cloudDrive, string args)
         {
             const string IP_ADDRESS = "ipaddress";
             const string DEPLOYMENT_ID = "deploymentid";
@@ -456,7 +456,8 @@ namespace WorkerRole
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                WorkingDirectory = workingDirectory
+                WorkingDirectory = workingDirectory,
+                Arguments = args
             };
 
             EnvironmentVariables(startInfo, environmentVariables);
@@ -581,12 +582,15 @@ namespace WorkerRole
                 Tracer.WriteLine("Starting Queue Processor", "Information");
 
                 this.queueProcessor = new QueueProcessor(
-                    RoleEnvironment.GetConfigurationSettingValue("InboundQueue"),
-                    RoleEnvironment.GetConfigurationSettingValue("OutboundQueue"),
-                    int.Parse(RoleEnvironment.GetConfigurationSettingValue("QueueCommandTimeout")),
+                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.InboundQueue"),
+                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.OutboundQueue"),
+                    int.Parse(RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.CommandTimeout")),
                     GetWorkingDirectory(),
                     RoleEnvironment.GetConfigurationSettingValue("EnvironmentVariables"),
-                    this.cloudDrive);
+                    this.cloudDrive,
+                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.InboundBlobContainer"),
+                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.OutboundBlobContainer"),
+                    RoleEnvironment.GetConfigurationSettingValue("BatchProcessing.Command"));
 
                 this.queueProcessor.Start();
             }
@@ -774,7 +778,7 @@ namespace WorkerRole
                 {
                     if (command != string.Empty)
                     {
-                        Process process = Run(workingDirectory, environmentVariables, command, this.cloudDrive);
+                        Process process = Run(workingDirectory, environmentVariables, command, this.cloudDrive, null);
                         processes.Add(process);
                         Tracer.WriteLine(string.Format("Process {0} started,({1})", process.Handle, command), "Information");
                     }

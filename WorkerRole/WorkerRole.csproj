@@ -120,6 +120,7 @@
     <Compile Include="BlobExtensions.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogEntry.cs" />
+    <Compile Include="ProcessingTask.cs" />
     <Compile Include="QueueProcessor.cs" />
     <Compile Include="RunMe.cs" />
     <Compile Include="Tracer.cs" />
