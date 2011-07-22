@@ -205,7 +205,7 @@ namespace WorkerRole
 
             blob.DownloadToFile(Path.Combine(this.WorkingDirectory, filename));
 
-            Tracer.WriteLine(string.Format("Downloaded {1}", blob.Uri), "Information");
+            Tracer.WriteLine(string.Format("Downloaded {0}", blob.Uri), "Information");
         }
 
         private void DeleteFile(string filename)

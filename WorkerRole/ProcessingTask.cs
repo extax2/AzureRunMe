@@ -32,6 +32,11 @@ namespace WorkerRole
     {
 
         /// <summary>
+        /// Your internal reference
+        /// </summary>
+        public string Reference { get; set; }
+
+        /// <summary>
         /// The URI for the input file to process. Optionally set by the task initiator, if an input file is being passed in to process
         /// </summary>
         public string InputFilename { get; set; }

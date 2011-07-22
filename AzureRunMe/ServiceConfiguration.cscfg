@@ -5,7 +5,7 @@
     <ConfigurationSettings>
       <Setting name="Label" value="YOURPROJECT on AzureRunMe $version$" />
       <Setting name="DataConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="Packages" value="runme/runme.zip" />
+      <Setting name="Packages" value="runme/runme.zip;runme/resize.zip" />
       <Setting name="AlwaysInstallPackages" value="false" />
       <Setting name="WorkingDirectory" value="c:\applications\" />
       <Setting name="EnvironmentVariables" value="azurerunme=true;pi=3.14" />
@@ -40,7 +40,7 @@
       <Setting name="BatchProcessing.CommandTimeout" value="600" />
       <Setting name="BatchProcessing.InboundBlobContainer" value="inbound" />
       <Setting name="BatchProcessing.OutboundBlobContainer" value="outbound" />
-      <Setting name="BatchProcessing.Command" value="runme.bat" />
+      <Setting name="BatchProcessing.Command" value="resize.exe" />
     </ConfigurationSettings>
     <Certificates>
       <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="E16E8C182ECE44B5B1E3742955A5D022BB6F30B2" thumbprintAlgorithm="sha1" />
